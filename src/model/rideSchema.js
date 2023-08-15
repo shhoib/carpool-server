@@ -15,9 +15,13 @@ const rideSchema = new mongoose.Schema({
             state: String
         }],
     },
-    hostedRides:{
-        type:[{
-            
-        }]
+    date:{
+        type: Number
+    },
+    passengers:{
+        type: Number
+    },
+    hoster:{
+        type: String
     }
 })

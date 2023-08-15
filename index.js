@@ -4,7 +4,6 @@ const cors = require('cors');
 require('dotenv').config();
 
 const PORT = process.env.PORT;
-console.log(PORT);
 
 app.use(cors());
 app.use(express.json())
@@ -13,12 +12,8 @@ const mongoose = require("mongoose");
 mongoose.connect("mongodb://127.0.0.1:27017/coride")
 const db= mongoose.connection;
 
-const items = ['a','b','c']
-
-app.get('/coride/items',(req,res)=>{
-    res.json(items)
-})
-
+const userRoute = require('./src/routes/userRoute')
+app.use('/',userRoute)
 
 
 app.listen(PORT,()=>console.log("server started")); 
