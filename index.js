@@ -17,3 +17,4 @@ app.use('/',userRoute)
 
 
 app.listen(PORT,()=>console.log("server started")); 
+console.log(PORT);
