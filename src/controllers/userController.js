@@ -1,22 +1,35 @@
 const User = require("../model/userSchema")
 
-
+//////////signup////////
 const signupUser= async (req,res)=>{
-    try{
+  
         const {email,displayName} = req.body;
 
-        const existingUser = User.findOne({email})
+        const existingUser = await User.findOne({email})
 
         if(!existingUser){
             const user = new User({name:displayName,email:email})
             await user.save();
-            res.json({message: "user registered successfully"})
+            res.status(201).json({message: "user registered successfully"})
         }else{
-            console.log("user already registered");
+            res.status(400).json({message:"user already registered"});
         }
-    }catch(error){
-        console.log(error);
     }
+   
+
+//////////login/////////
+
+const login = async (req,res)=>{
+    const {email,displayName} = req.body;
+
+    const existingUser =  await User.findOne({email});
+    if(existingUser){
+        res.status(200).json({message:"user logged in successfully"})
+    }else{
+        res.status(404).json({message:"please signup first"})
+    }
+
 }
-  
-module.exports = {signupUser}
+
+
+module.exports = {signupUser,login};
