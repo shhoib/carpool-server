@@ -5,8 +5,10 @@ require('dotenv').config();
 
 const PORT = process.env.PORT;
 
-app.use(cors());
+app.use(cors()); 
 app.use(express.json())
+// app.use(express.urlencoded({ limit: "30mb", extended: true }));
+
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://127.0.0.1:27017/coride")

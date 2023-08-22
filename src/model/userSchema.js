@@ -11,22 +11,20 @@ const userSchema = new mongoose.Schema({
     },
     mobile:{
         type:Number,
-        required:true
+        // required:true
     },
     password:{
         type:String,
-        required:true
+        // required:true
     },
     gender:{
         type:String,
-        required:true
+        // required:true
     },
     feedback:{
         type:String,
     },
     
-    password:{
-        type:String,
-        required:true
-    },
 })
+
+module.exports = mongoose.model('user',userSchema)
