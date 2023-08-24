@@ -1,27 +1,24 @@
 const mongoose = require("mongoose");
 
 const rideSchema = new mongoose.Schema({
-    currentLocation:{
-        type:[{
-            street : String,
-            city: String,
-            state: String
-        }],
+    from:{
+        type: String,
     },
-    destination:{
-        type:[{
-            street : String,
-            city: String,
-            state: String
-        }],
+    to:{
+        type: String,
     },
     date:{
-        type: Number
+        type: String
     },
     passengers:{
         type: Number
+    },
+    vehicle:{
+        type : String
     },
     hoster:{
         type: String
     }
 })
+
+module.exports= mongoose.model('Rides',rideSchema);
