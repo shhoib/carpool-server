@@ -16,6 +16,9 @@ const rideSchema = new mongoose.Schema({
     vehicle:{
         type : String
     },
+    amount:{
+        type:Number
+    },
     hoster:{
         type: String
     }

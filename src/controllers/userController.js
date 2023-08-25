@@ -34,8 +34,8 @@
     ////////hostRide////////
 
     const hostRide = async (req,res)=>{
-        const {from,to,date,passengers,vehicle} = req.body;
-        const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle})
+        const {from,to,date,passengers,vehicle,amount} = req.body;
+        const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle,amount:amount})
         await ride.save();
         console.log('saved');
         res.status(201).json({message:"ride hosted completely"})
