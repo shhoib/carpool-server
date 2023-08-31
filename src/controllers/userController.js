@@ -1,15 +1,18 @@
     const User = require("../model/userSchema")
     const rides = require('../model/rideSchema')
+    const bcrypt = require("bcrypt")
+
 
     //////////signup////////
     const signup= async (req,res)=>{
     
-            const {email,displayName} = req.body;
-
+            const {email,displayName,password,username} = req.body;
+       
             const existingUser = await User.findOne({email})
-
+            
             if(!existingUser){
-                const user = new User({name:displayName,email:email})
+                const hashedPasssword = await bcrypt.hash(password,10)
+                const user = new User({name:displayName||username,email:email,password:hashedPasssword})
                 await user.save();
                 res.status(201).json({message: "logged in successfully"})
             }else{
@@ -17,19 +20,29 @@
             }
         }
     
-
+ 
     //////////login/////////
 
-    const login = async (req,res)=>{
-        const {email} = req.body;
+    const login = async (req, res) => {
+    const { email, password ,username} = req.body;
+    console.log(username);
+    const user = await User.findOne({ email });
 
-        const existingUser =  await User.findOne({email});
-        if(existingUser){
-            res.status(200).json({message:"user logged in successfully"})
-        }else{
-            res.status(400).json({message:"please signup first"})
+    if (user) {
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (passwordMatch) {
+            res.status(200).json({ message: "user logged in successfully" });
+        } else {
+            res.status(403).json({ message: "username or password mismatch" });
         }
+    } else {
+        res.status(404).json({ message: "please register first" });
     }
+};
+
+
+
 
     ////////hostRide////////
 
@@ -44,9 +57,13 @@
     ///////////joinRide///////////
 
     const joinRide = async (req, res) => {
-        const { from, to, date } = req.body;
+        const { from, to, date } = req.query;
          const availableRides = await rides.find({ from,to });
-         res.json({ rides: availableRides });
+         if(availableRides){
+             res.json({message:"available rides", rides: availableRides });
+            }else{
+                res.json({message:"no rides available"})
+            }
        
     };
 
