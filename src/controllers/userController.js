@@ -1,20 +1,23 @@
     const User = require("../model/userSchema")
     const rides = require('../model/rideSchema')
     const bcrypt = require("bcrypt")
+    const jwt = require('jsonwebtoken')
 
-
+ 
     //////////signup////////
     const signup= async (req,res)=>{
-    
+            console.log('this worksing')
             const {email,displayName,password,username} = req.body;
        
             const existingUser = await User.findOne({email})
-            
             if(!existingUser){
-                const hashedPasssword = await bcrypt.hash(password,10)
-                const user = new User({name:displayName||username,email:email,password:hashedPasssword})
+                // const hashedPasssword = await bcrypt.hash(password,10)
+                const user = new User({name:displayName||username,email:email})  //TODO: save password
                 await user.save();
-                res.status(201).json({message: "logged in successfully"})
+                
+                const token = jwt.sign(username,'secretKey')
+
+                res.status(201).json({message: "logged in successfully",token:token})
             }else{
                 res.json({message:"user already registered"});
             }
@@ -24,20 +27,20 @@
     //////////login/////////
 
     const login = async (req, res) => {
-    const { email, password ,username} = req.body;
-    console.log(username);
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (passwordMatch) {
-            res.status(200).json({ message: "user logged in successfully" });
+            const token = jwt.sign(user.name,'secretKey')
+            res.status(200).json({ message: "user logged in successfully",token:token });
         } else {
-            res.status(403).json({ message: "username or password mismatch" });
+            res.status(209).json({ message: "username or password mismatch" });
         }
     } else {
-        res.status(404).json({ message: "please register first" });
+        res.status(204).json({ message: "please register first" });
     }
 };
 
