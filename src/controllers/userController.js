@@ -6,20 +6,20 @@
  
     //////////signup////////
     const signup= async (req,res)=>{
-            console.log('this worksing')
             const {email,displayName,password,username} = req.body;
        
+            const token = jwt.sign({username},'secretKey')
+
             const existingUser = await User.findOne({email})
             if(!existingUser){
                 // const hashedPasssword = await bcrypt.hash(password,10)
                 const user = new User({name:displayName||username,email:email})  //TODO: save password
                 await user.save();
                 
-                const token = jwt.sign(username,'secretKey')
 
-                res.status(201).json({message: "logged in successfully",token:token})
+                res.status(201).json({message: "logged in successfully",token})
             }else{
-                res.json({message:"user already registered"});
+                res.json({message:"user already registered",token});
             }
         }
     
