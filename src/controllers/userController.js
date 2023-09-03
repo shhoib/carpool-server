@@ -6,29 +6,46 @@
  
     //////////signup////////
     const signup= async (req,res)=>{
-            const {email,displayName,password,username} = req.body;
+            const {email,password,username} = req.body;
        
             const token = jwt.sign({username},'secretKey')
 
             const existingUser = await User.findOne({email})
             if(!existingUser){
-                // const hashedPasssword = await bcrypt.hash(password,10)
-                const user = new User({name:displayName||username,email:email})  // TODO : save password
-                await user.save();
+                const hashedPasssword = await bcrypt.hash(password,10)
+                const user = new User({name:username,email:email,password:hashedPasssword}) 
                 
 
-                res.status(201).json({message: "logged in successfully",token})
+                res.status(201).json({message: "Account created successfully, Logging In",token})
             }else{
                 res.json({message:"user already registered",token});
             }
         }
+
+     /////////signupWith googleAuth///////////
+     
+     const signupWithGoogleAuth = async(req,res)=>{
+        const {email,displayName} = req.body;
+
+        const token = jwt.sign({displayName},'secretKey')
+
+        const existingUser = await User.findOne({email})
+        if(!existingUser){
+            const user = new User ({name:displayName,email:email});
+            await user.save();
+
+            res.status(201).json({message:'Account created successfully, Logging In',token})
+        }else{
+            res.json({message:'user already registered',token})
+        }
+
+     }
     
  
     //////////login/////////
 
     const login = async (req, res) => {
     const { email, password } = req.body;
-    console.log(email);
     const user = await User.findOne({ email });
 
     if (user) {
@@ -45,6 +62,21 @@
     }
 };
 
+
+
+////////////login googleAuth///////////
+
+  const loginWithGoogleAuth = async(req,res)=>{
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if(user){
+        const token = jwt.sign(user.name,'secretKey')
+        res.status(201).json({message:"user logged in succesfully", token})
+    }else{
+        res.status(209).json({message:'no user found, Redirecting to SignUp'})
+    }
+  }
 
 
 
@@ -71,4 +103,4 @@
        
     };
 
-    module.exports = {signup,login,hostRide,joinRide};
+    module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth};
