@@ -13,7 +13,7 @@
             const existingUser = await User.findOne({email})
             if(!existingUser){
                 // const hashedPasssword = await bcrypt.hash(password,10)
-                const user = new User({name:displayName||username,email:email})  //TODO: save password
+                const user = new User({name:displayName||username,email:email})  // TODO : save password
                 await user.save();
                 
 
@@ -28,19 +28,20 @@
 
     const login = async (req, res) => {
     const { email, password } = req.body;
+    console.log(email);
     const user = await User.findOne({ email });
 
     if (user) {
         const passwordMatch = await bcrypt.compare(password, user.password);
-
+        const username = user.name;
         if (passwordMatch) {
             const token = jwt.sign(user.name,'secretKey')
-            res.status(200).json({ message: "user logged in successfully",token:token });
+            res.status(200).json({ message: "user logged in successfully",token,username });
         } else {
             res.status(209).json({ message: "username or password mismatch" });
         }
     } else {
-        res.status(204).json({ message: "please register first" });
+        res.status(204).json({ message: "please register first, Redirecting to signup" });
     }
 };
 
