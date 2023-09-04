@@ -94,7 +94,9 @@
 
     const joinRide = async (req, res) => {
         const { from, to, date } = req.query;
-         const availableRides = await rides.find({ from,to });
+        console.log(from,to,date); 
+         const availableRides = await rides.find({ from,to,date });
+         console.log(availableRides);
          if(availableRides){
              res.json({message:"available rides", rides: availableRides });
             }else{
