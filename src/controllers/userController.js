@@ -83,10 +83,9 @@
     ////////hostRide////////
 
     const hostRide = async (req,res)=>{
-        const {from,to,date,passengers,vehicle,amount} = req.body;
-        const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle,amount:amount})
+        const {from,to,date,passengers,vehicle,amount,hoster} = req.body;
+        const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle,amount:amount,hoster:hoster})
         await ride.save();
-        console.log('saved');
         res.status(201).json({message:"ride hosted completely"})
     }
 
@@ -94,9 +93,7 @@
 
     const joinRide = async (req, res) => {
         const { from, to, date } = req.query;
-        console.log(from,to,date); 
          const availableRides = await rides.find({ from,to,date });
-         console.log(availableRides);
          if(availableRides){
              res.json({message:"available rides", rides: availableRides });
             }else{
