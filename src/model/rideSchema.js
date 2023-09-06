@@ -21,6 +21,9 @@ const rideSchema = new mongoose.Schema({
     },
     hoster:{
         type: String
+    },
+    hosterID:{
+        type: String
     }
 })
 

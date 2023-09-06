@@ -14,6 +14,7 @@
             if(!existingUser){
                 const hashedPasssword = await bcrypt.hash(password,10)
                 const user = new User({name:username,email:email,password:hashedPasssword}) 
+                await user.save();
                 
                 const savedUser = await User.findOne({email})
                 const userID = savedUser._id;
@@ -53,12 +54,11 @@
     const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    const userID = user._id;
-    console.log(userID);
 
     if (user) {
         const passwordMatch = await bcrypt.compare(password, user.password);
         const username = user.name;
+        const userID = user._id;
         if (passwordMatch) {
             const token = jwt.sign(user.name,'secretKey')
             res.status(200).json({ message: "user logged in successfully",token,username,userID });
@@ -92,8 +92,9 @@
     ////////hostRide////////
 
     const hostRide = async (req,res)=>{
-        const {from,to,date,passengers,vehicle,amount,hoster} = req.body;
-        const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle,amount:amount,hoster:hoster})
+        const {from,to,date,passengers,vehicle,amount,hoster,hosterID} = req.body;
+        const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle,
+            amount:amount,hoster:hoster,hosterID:hosterID})
         await ride.save();
         res.status(201).json({message:"ride hosted completely"})
     }
