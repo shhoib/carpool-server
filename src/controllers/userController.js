@@ -15,10 +15,13 @@
                 const hashedPasssword = await bcrypt.hash(password,10)
                 const user = new User({name:username,email:email,password:hashedPasssword}) 
                 
+                const savedUser = await User.findOne({email})
+                const userID = savedUser._id;
 
-                res.status(201).json({message: "Account created successfully, Logging In",token})
+                res.status(201).json({message: "Account created successfully, Logging In",token,userID})
             }else{
-                res.json({message:"user already registered",token});
+                const userID = existingUser._id;
+                res.json({message:"user already registered",token,userID});
             }
         }
 
@@ -34,11 +37,14 @@
             const user = new User ({name:displayName,email:email});
             await user.save();
 
-            res.status(201).json({message:'Account created successfully, Logging In',token})
-        }else{
-            res.json({message:'user already registered',token})
-        }
+            const savedUser = await User.findOne({email})
+            const userID = savedUser._id;
 
+            res.status(201).json({message:'Account created successfully, Logging In',token,userID})
+        }else{
+            const userID = existingUser._id;
+            res.json({message:'user already registered',token,userID})
+        }
      }
     
  
@@ -47,13 +53,15 @@
     const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    const userID = user._id;
+    console.log(userID);
 
     if (user) {
         const passwordMatch = await bcrypt.compare(password, user.password);
         const username = user.name;
         if (passwordMatch) {
             const token = jwt.sign(user.name,'secretKey')
-            res.status(200).json({ message: "user logged in successfully",token,username });
+            res.status(200).json({ message: "user logged in successfully",token,username,userID });
         } else {
             res.status(209).json({ message: "username or password mismatch" });
         }
@@ -69,10 +77,11 @@
   const loginWithGoogleAuth = async(req,res)=>{
     const { email } = req.body;
     const user = await User.findOne({ email });
+    const userID = user._id
 
     if(user){
         const token = jwt.sign(user.name,'secretKey')
-        res.status(201).json({message:"user logged in succesfully", token})
+        res.status(201).json({message:"user logged in succesfully", token,userID})
     }else{
         res.status(209).json({message:'no user found, Redirecting to SignUp'})
     }
@@ -101,5 +110,14 @@
             }
        
     };
+ 
+    /////////userDetails///////
 
-    module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth};
+    const rideDetails = async(req,res)=>{
+        const id = req.params.id;
+        const ride = await rides.findById({_id:id})
+        res.status(200).json({ride:ride})
+       
+    }
+
+    module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails};
