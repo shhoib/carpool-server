@@ -10,5 +10,6 @@ user_route.post('/login/googleAuth',tryCatchMiddleware(user.loginWithGoogleAuth)
 user_route.post('/hostRide',tryCatchMiddleware(user.hostRide))
 user_route.get('/JoinRide',tryCatchMiddleware(user.joinRide))
 user_route.get('/rideDetails/:id',tryCatchMiddleware(user.rideDetails))
+user_route.get('/hosterDetails/:id',tryCatchMiddleware(user.hosterDetails))
 
 module.exports = user_route;

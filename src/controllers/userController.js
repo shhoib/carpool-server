@@ -121,4 +121,12 @@
        
     }
 
-    module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails};
+    ////////hosterDetails///
+    const hosterDetails = async(req,res)=>{
+        const id = req.params.id;
+        const hoster = await User.findById({_id:id})
+        res.status(200).json({hoster})
+    }
+
+    module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
+        hosterDetails};
