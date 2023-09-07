@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema({
     feedback:{
         type:String,
     },
+    about:{
+        type:String,
+    },
     
 })
 
