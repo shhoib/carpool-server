@@ -155,10 +155,11 @@
             const hashedPassword = await bcrypt.hash(newPassword,10)
             const newPASSWORD = {
                 password:hashedPassword
-            }
-            
+            }            
             const updatedPassword = await User.findByIdAndUpdate(userID,newPASSWORD, {new:true});
             res.status(200).json({message:"Password updated successfully",updatedPassword})
+        }else{
+            res.status(209).json({message:"The password you entered is not your current password"})
         }
     }
  
