@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    mobile:{
+    phoneNumber:{
         type:Number,
         // required:true
     },
@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema({
     },
     emailVerified:{
         type:Boolean,
+    },
+    phoneNumberVerified:{
+        type:Boolean,
+    },
+    DOB:{
+        type:Number,
     },
     feedback:{
         type:String,

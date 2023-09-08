@@ -11,5 +11,7 @@ user_route.post('/hostRide',tryCatchMiddleware(user.hostRide))
 user_route.get('/JoinRide',tryCatchMiddleware(user.joinRide))
 user_route.get('/rideDetails/:id',tryCatchMiddleware(user.rideDetails))
 user_route.get('/hosterDetails/:id',tryCatchMiddleware(user.hosterDetails))
+user_route.post('/EditPersonalDetails',tryCatchMiddleware(user.EditPersonalDetails))
+user_route.post('/EditPassword',tryCatchMiddleware(user.EditPassword))
 
 module.exports = user_route;

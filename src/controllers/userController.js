@@ -6,14 +6,15 @@
  
     //////////signup////////
     const signup= async (req,res)=>{
-            const {email,password,username} = req.body;
+            const {email,password,username,phoneNumber} = req.body;
        
             const token = jwt.sign({username},'secretKey')
 
             const existingUser = await User.findOne({email})
             if(!existingUser){
                 const hashedPasssword = await bcrypt.hash(password,10)
-                const user = new User({name:username,email:email,password:hashedPasssword}) 
+                const user = new User({name:username,email:email,password:hashedPasssword,
+                    phoneNumber:phoneNumber,emailVerified:false,phoneNumberVerified:false}) 
                 await user.save();
                 
                 const savedUser = await User.findOne({email})
@@ -35,7 +36,7 @@
 
         const existingUser = await User.findOne({email})
         if(!existingUser){
-            const user = new User ({name:displayName,email:email});
+            const user = new User ({name:displayName,email:email,emailVerified:true,phoneNumberVerified:false});
             await user.save();
 
             const savedUser = await User.findOne({email})
@@ -57,11 +58,9 @@
 
     if (user) {
         const passwordMatch = await bcrypt.compare(password, user.password);
-        const username = user.name;
-        const userID = user._id;
         if (passwordMatch) {
             const token = jwt.sign(user.name,'secretKey')
-            res.status(200).json({ message: "user logged in successfully",token,username,userID });
+            res.status(200).json({ message: "user logged in successfully",token,user });
         } else {
             res.status(209).json({ message: "username or password mismatch" });
         }
@@ -77,11 +76,10 @@
   const loginWithGoogleAuth = async(req,res)=>{
     const { email } = req.body;
     const user = await User.findOne({ email });
-    const userID = user._id
 
     if(user){
         const token = jwt.sign(user.name,'secretKey')
-        res.status(201).json({message:"user logged in succesfully", token,userID})
+        res.status(201).json({message:"user logged in succesfully", token,user})
     }else{
         res.status(209).json({message:'no user found, Redirecting to SignUp'})
     }
@@ -124,9 +122,45 @@
     ////////hosterDetails///
     const hosterDetails = async(req,res)=>{
         const id = req.params.id;
-        const hoster = await User.findById({_id:id})
+        const hoster = await User.findById({_id:id}) 
         res.status(200).json({hoster})
     }
+ 
+    const EditPersonalDetails = async(req,res)=>{ //TODO : update not completed some axios error
+        const {name,email,phoneNumber,DOB,about,userID} = req.body;
 
+        const updateFields = {
+            name:name,
+            email:email,
+            phoneNumber:phoneNumber,
+            DOB:DOB,
+            about:about
+        };
+
+        const updatedUser = await User.findByIdAndUpdate(userID, updateFields, { new: true });
+
+        console.log(updatedUser);
+        res.status(200).json({message:"profile updated succesfully"})
+    }
+
+
+    ///////////editPassword////////
+    const EditPassword = async(req,res)=>{
+        const {oldPassword,newPassword,userID} = req.body;
+        const user = await User.findOne({ _id:userID });
+
+        const passwordMatch = await bcrypt.compare(oldPassword, user.password)
+        
+        if(passwordMatch){
+            const hashedPassword = await bcrypt.hash(newPassword,10)
+            const newPASSWORD = {
+                password:hashedPassword
+            }
+            
+            const updatedPassword = await User.findByIdAndUpdate(userID,newPASSWORD, {new:true});
+            res.status(200).json({message:"Password updated successfully",updatedPassword})
+        }
+    }
+ 
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
-        hosterDetails};
+        hosterDetails,EditPersonalDetails,EditPassword};
