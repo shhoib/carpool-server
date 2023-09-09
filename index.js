@@ -3,6 +3,9 @@ const app = express();
 const cors = require('cors');
 require('dotenv').config();
 
+var http = require('http').createServer(app)
+var io = require('socket.io')(http)
+
 const PORT = process.env.PORT;
 
 app.use(cors()); 
@@ -18,5 +21,5 @@ const userRoute = require('./src/routes/userRoute')
 app.use('/',userRoute)
 
 
-app.listen(PORT,()=>console.log("server started")); 
+http.listen(PORT,()=>console.log("server started")); 
 console.log(PORT);
