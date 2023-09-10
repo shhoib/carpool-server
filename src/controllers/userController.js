@@ -162,6 +162,18 @@
             res.status(209).json({message:"The password you entered is not your current password"})
         }
     }
+
+
+    //////////myRIdes/////
+    const myRides = async(req,res)=>{
+        const ID = req.params.id; 
+         const myrides = await rides.find({hosterID:ID});
+         if(myrides){
+            res.status(200).json({message:'your rides',myrides})
+         }else{
+            res.status(209).json({message:"you have not hosted any ride"})
+         }
+    }
  
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
-        hosterDetails,EditPersonalDetails,EditPassword};
+        hosterDetails,EditPersonalDetails,EditPassword,myRides};
