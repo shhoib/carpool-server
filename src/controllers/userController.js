@@ -1,5 +1,6 @@
     const User = require("../model/userSchema")
     const rides = require('../model/rideSchema')
+    const Chat = require('../model/chatSchema')
     const bcrypt = require("bcrypt")
     const jwt = require('jsonwebtoken')
 
@@ -174,6 +175,23 @@
             res.status(209).json({message:"you have not hosted any ride"})
          }
     }
+
+
+    //////////fetchChat///////////
+    const fetchChat =async(req,res)=>{
+        const {hosterId,userId} = req.query
+        // console.log(hosterId,userId);
+
+        const isChat = await Chat.findOne({userID:userId,hosterID:hosterId});
+
+        if(isChat){
+            res.status(200).json({chat:isChat})
+        }else{
+            const newChat = new Chat({userID:userId,hosterID:hosterId})
+            await newChat.save()
+            res.status(201).json({chat:newChat})
+        }
+    }
  
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
-        hosterDetails,EditPersonalDetails,EditPassword,myRides};
+        hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat};

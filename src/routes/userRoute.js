@@ -14,5 +14,6 @@ user_route.get('/hosterDetails/:id',tryCatchMiddleware(user.hosterDetails))
 user_route.post('/EditPersonalDetails',tryCatchMiddleware(user.EditPersonalDetails))
 user_route.post('/EditPassword',tryCatchMiddleware(user.EditPassword))
 user_route.get('/myRides/:id',tryCatchMiddleware(user.myRides))
+user_route.get('/fetchChat',tryCatchMiddleware(user.fetchChat))
 
 module.exports = user_route;
