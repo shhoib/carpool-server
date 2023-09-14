@@ -193,5 +193,39 @@
         }
     }
  
+
+    //////fetchPreviuosChatDetails////////
+    const fetchPreviuosChatDetails= async(req,res)=>{
+        const {userID} = req.query;
+        console.log(userID);
+        const isUser = await Chat.find({userID:userID})
+        const isHoster = await Chat.find({userID:hosterID})
+        console.log(isUser);
+        console.log(isHoster);
+ 
+        if(isUser){
+            const allUsers = [];
+            for(const chatID of isUser){
+                const userDetails = await User.find({_id:chatID.hosterID});
+                if(userDetails){
+                    allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
+                }
+            }
+            console.log(allUsers);
+            res.status(200).json({chattedUsers:allUsers})
+        }else if(isHoster){
+            const allUsers = [];
+            for(const chatID of isHoster){
+                const userDetails = await User.find({_id:chatID.userID});
+                if(userDetails){
+                    allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
+                }
+            }
+            console.log(allUsers);
+            res.status(200).json({chattedUsers:allUsers})
+        }else{
+            res.status(209).json({message:'no previous chat available'})
+        }
+    }
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
-        hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat};
+        hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails};

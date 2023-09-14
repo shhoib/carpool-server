@@ -23,15 +23,14 @@ io.on('connection', (socket)=>{
 )
     socket.on('join_room',(data)=>{
         socket.join(data) 
-        console.log(`joined room ${data}`);
+        // console.log(`joined room ${data}`);
     })
 
     socket.on('send_message',(data)=>{ 
-        console.log('room',data.messageData.room);
-        socket.to(data.messageData.room).emit('receive_message', data)
-        console.log(data.message);
+        // console.log(data);
+        socket.to(data.room).emit('receive_message', data)
+        // console.log(data.message);
     })  
-
 })
 
 
