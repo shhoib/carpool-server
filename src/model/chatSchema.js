@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const chatSchema = new mongoose.Schema({
 
-    userID:{
+    fromID:{
         type: String
     },
-    hosterID:{
+    toID:{
         type: String
     }
 

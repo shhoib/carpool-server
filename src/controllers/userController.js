@@ -176,18 +176,26 @@
          }
     }
 
-
+ 
     //////////fetchChat///////////
     const fetchChat =async(req,res)=>{
-        const {hosterId,userId} = req.query
-        // console.log(hosterId,userId);
+        const {toId,fromId} = req.query
+        console.log(toId,fromId);
 
-        const isChat = await Chat.findOne({userID:userId,hosterID:hosterId});
-
+        const isChat = await Chat.findOne({
+        $or: [
+            { fromID: fromId, toID: toId },
+            { fromID: toId, toID: fromId }
+        ]
+    }) 
+        // console.log(isChat); 
+  
         if(isChat){
+            // console.log('chat available');
             res.status(200).json({chat:isChat})
         }else{
-            const newChat = new Chat({userID:userId,hosterID:hosterId})
+            // console.log('not available');
+            const newChat = new Chat({fromID:fromId,toID:toId})
             await newChat.save()
             res.status(201).json({chat:newChat})
         }
@@ -197,35 +205,62 @@
     //////fetchPreviuosChatDetails////////
     const fetchPreviuosChatDetails= async(req,res)=>{
         const {userID} = req.query;
-        console.log(userID);
-        const isUser = await Chat.find({userID:userID})
-        const isHoster = await Chat.find({userID:hosterID})
-        console.log(isUser);
-        console.log(isHoster);
- 
-        if(isUser){
-            const allUsers = [];
-            for(const chatID of isUser){
-                const userDetails = await User.find({_id:chatID.hosterID});
+
+        const isSender = await Chat.find({fromID:userID})
+        const isReceiver = await Chat.find({toID:userID})
+        // console.log('sender',isSender);
+        // console.log('receiver',isReceiver);
+            
+
+         const allUsers = [];    
+
+        if(isSender.length>0){  
+            for(const chatID of isSender){
+                const userDetails = await User.find({_id:chatID.toID});
+                // console.log('first',userDetails)
                 if(userDetails){
                     allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
                 }
             }
-            console.log(allUsers);
-            res.status(200).json({chattedUsers:allUsers})
-        }else if(isHoster){
-            const allUsers = [];
-            for(const chatID of isHoster){
-                const userDetails = await User.find({_id:chatID.userID});
-                if(userDetails){
-                    allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
-                }
-            }
-            console.log(allUsers);
-            res.status(200).json({chattedUsers:allUsers})
-        }else{
-            res.status(209).json({message:'no previous chat available'})
+            // console.log(allUsers);
         }
+         if(isReceiver.length>0){ 
+            for(const chatID of isReceiver){
+                const userDetails = await User.find({_id:chatID.fromID});
+                // console.log('second',userDetails)
+                if(userDetails){
+                    allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
+                }
+            }
+        }
+        // console.log("last",allUsers);
+
+         res.status(200).json({chattedUsers:allUsers})
+
+ 
+        // if(isSender){
+        //     const allUsers = [];
+        //     for(const chatID of isSender){
+        //         const userDetails = await User.find({_id:chatID.hosterID});
+        //         if(userDetails){
+        //             allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
+        //         }
+        //     }
+        //     console.log(allUsers);
+        //     res.status(200).json({chattedUsers:allUsers})
+        // }else if(isReceiver){
+        //     const allUsers = [];
+        //     for(const chatID of isReceiver){
+        //         const userDetails = await User.find({_id:chatID.userID});
+        //         if(userDetails){
+        //             allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
+        //         }
+        //     }
+        //     console.log(allUsers);
+        //     res.status(200).json({chattedUsers:allUsers})
+        // }else{
+        //     res.status(209).json({message:'no previous chat available'})
+        // }
     }
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails};
