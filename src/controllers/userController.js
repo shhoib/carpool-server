@@ -185,7 +185,7 @@
         const isChat = await Chat.findOne({
         $or: [
             { fromID: fromId, toID: toId },
-            { fromID: toId, toID: fromId }
+            { fromID: toId, toID: fromId }   
         ]
     }) 
         // console.log(isChat); 
