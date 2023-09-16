@@ -49,12 +49,12 @@
             res.json({message:'user already registered',token,userID})
         }
      }
-    
- 
+           
+  
     //////////login/////////
 
     const login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body; 
     const user = await User.findOne({ email });
 
     if (user) {
@@ -178,9 +178,9 @@
 
  
     //////////fetchChat///////////
-    const fetchChat =async(req,res)=>{
+    const fetchChat =async(req,res)=>{   
         const {toId,fromId} = req.query
-        console.log(toId,fromId);
+        console.log(toId,fromId); 
 
         const isChat = await Chat.findOne({
         $or: [
