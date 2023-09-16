@@ -129,18 +129,20 @@
  
     const EditPersonalDetails = async(req,res)=>{ //TODO : update not completed some axios error
         const {name,email,phoneNumber,DOB,about,userID} = req.body;
+        console.log(name,phoneNumber);
 
         const updateFields = {
-            name:name,
+            name:name, 
             email:email,
-            phoneNumber:phoneNumber,
+            phoneNumber:phoneNumber, 
             DOB:DOB,
             about:about
         };
+        // console.log(updateFields);
 
         const updatedUser = await User.findByIdAndUpdate(userID, updateFields, { new: true });
 
-        console.log(updatedUser);
+        // console.log(updatedUser);
         res.status(200).json({message:"profile updated succesfully"})
     }
 
@@ -169,6 +171,7 @@
     const myRides = async(req,res)=>{
         const ID = req.params.id; 
          const myrides = await rides.find({hosterID:ID});
+         console.log(myrides);
          if(myrides){
             res.status(200).json({message:'your rides',myrides})
          }else{

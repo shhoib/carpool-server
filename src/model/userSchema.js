@@ -30,6 +30,9 @@ const userSchema = new mongoose.Schema({
     DOB:{
         type:Number,
     },
+    profileURL:{
+        type: String
+    },
     feedback:{
         type:String,
     },
