@@ -24,6 +24,12 @@ const rideSchema = new mongoose.Schema({
     },
     hosterID:{
         type: String
+    },
+    joinerID:{
+        type: String
+    },
+    isCompleted : {
+        type : Boolean
     }
 })
 

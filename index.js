@@ -17,25 +17,28 @@ const io = new Server(server,{
 
 io.on('connection', (socket)=>{
     // console.log(`user connected : ${socket.id}`);
-
+ 
     socket.on('disconnect',()=>{
         // console.log(`user disconnected: ${socket.id}`);
-    }
-) 
+    })
+
     socket.on('join_room',(data)=>{
         console.log(data);
         socket.join(data) 
         console.log(`joined room ${data}`);
     })
-
+ 
     socket.on('send_message',(data)=>{ 
-        // console.log(data);
         socket.to(data.room).emit('receive_message', data)
-        // console.log(data.message);
+    })   
+    socket.on('send_notification',(data)=>{ 
+        console.log(data.socketID,'hi');
+        console.log(data);
+        socket.to(data.socketID).emit('receive_notification',data.message)
     })  
 })
 
-
+ 
 const PORT = process.env.PORT;
 
 app.use(cors()); 
