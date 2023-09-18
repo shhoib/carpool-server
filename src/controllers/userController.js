@@ -203,6 +203,31 @@
             res.status(201).json({chat:newChat})
         }
     }
+
+
+    //////////fetchChatForNotification///////////
+    const fetchChatForNotification =async(req,res)=>{   
+        const {toId,fromId} = req.query
+        console.log(toId,fromId); 
+
+        const isChat = await Chat.findOne({
+        $or: [
+            { fromID: fromId, toID: toId },
+            { fromID: toId, toID: fromId }   
+        ]
+    }) 
+        // console.log(isChat); 
+  
+        if(isChat){
+            // console.log('chat available');
+            res.status(200).json({chat:isChat})
+        }else{
+            // console.log('not available');
+            const newChat = new Chat({fromID:fromId,toID:toId})
+            await newChat.save()
+            res.status(201).json({chat:newChat})
+        }
+    }
  
 
     //////fetchPreviuosChatDetails////////
@@ -266,4 +291,5 @@
         // }
     }
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
-        hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails};
+        hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
+        fetchChatForNotification};

@@ -23,7 +23,6 @@ io.on('connection', (socket)=>{
     })
 
     socket.on('join_room',(data)=>{
-        console.log(data);
         socket.join(data) 
         console.log(`joined room ${data}`);
     })
@@ -31,10 +30,9 @@ io.on('connection', (socket)=>{
     socket.on('send_message',(data)=>{ 
         socket.to(data.room).emit('receive_message', data)
     })   
-    socket.on('send_notification',(data)=>{ 
-        console.log(data.socketID,'hi');
-        console.log(data);
-        socket.to(data.socketID).emit('receive_notification',data.message)
+    socket.on('send_notification',(data)=>{
+        console.log(data.room);
+        socket.to(data.room).emit('receive_notification',data.message)
     })  
 })
 
