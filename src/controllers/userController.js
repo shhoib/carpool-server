@@ -166,14 +166,17 @@
         }
     }
 
-
+ 
     //////////myRIdes/////
     const myRides = async(req,res)=>{
         const ID = req.params.id; 
          const myrides = await rides.find({hosterID:ID});
-         console.log(myrides);
+         const joinedRides = await rides.find({joinerID:ID});
+         console.log(joinedRides);
+        //  console.log(myrides);
+        const allRides = {joinedRides,myrides}
          if(myrides){
-            res.status(200).json({message:'your rides',myrides})
+            res.status(200).json({message:'your rides',allRides})
          }else{
             res.status(209).json({message:"you have not hosted any ride"})
          }

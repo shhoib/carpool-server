@@ -29,7 +29,8 @@ const rideSchema = new mongoose.Schema({
         type: String
     },
     isCompleted : {
-        type : Boolean
+        type : Boolean,
+        default: false
     }
 })
 
