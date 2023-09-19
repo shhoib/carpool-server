@@ -31,12 +31,13 @@ io.on('connection', (socket)=>{
         socket.to(data.room).emit('receive_message', data)
     })   
     socket.on('send_notification',(data)=>{
-        console.log(data.room);
-        socket.to(data.room).emit('receive_notification',data.message)
+        const {socketID,message} = data
+        // console.log(socketID,message); 
+        socket.to(socketID).emit('receive_notification',message)
     })  
 })
 
- 
+  
 const PORT = process.env.PORT;
 
 app.use(cors()); 
