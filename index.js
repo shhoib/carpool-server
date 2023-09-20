@@ -35,6 +35,8 @@ io.on('connection', (socket)=>{
         // console.log(socketID,message); 
         socket.to(socketID).emit('receive_notification',message)
     })  
+    socket.on('typing', (room) => socket.in(room).emit('typing'))
+    socket.on('stop typing', (room) => socket.in(room).emit('stop typing'))
 })
 
   
