@@ -3,6 +3,8 @@
     const Chat = require('../model/chatSchema')
     const bcrypt = require("bcrypt")
     const jwt = require('jsonwebtoken')
+    const cloudinary = require('../cloudinary/cloudinary')
+    const path = require('path')
 
  
     //////////signup////////
@@ -268,31 +270,22 @@
 
          res.status(200).json({chattedUsers:allUsers})
 
- 
-        // if(isSender){
-        //     const allUsers = [];
-        //     for(const chatID of isSender){
-        //         const userDetails = await User.find({_id:chatID.hosterID});
-        //         if(userDetails){
-        //             allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
-        //         }
-        //     }
-        //     console.log(allUsers);
-        //     res.status(200).json({chattedUsers:allUsers})
-        // }else if(isReceiver){
-        //     const allUsers = [];
-        //     for(const chatID of isReceiver){
-        //         const userDetails = await User.find({_id:chatID.userID});
-        //         if(userDetails){
-        //             allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
-        //         }
-        //     }
-        //     console.log(allUsers);
-        //     res.status(200).json({chattedUsers:allUsers})
-        // }else{
-        //     res.status(209).json({message:'no previous chat available'})
-        // }
     }
+
+        const uploadImage = async(req,res)=>{
+            try{
+                console.log(req.file);
+                const uploader = async(path)=> await cloudinary.uploads(path,'profilePic');
+                const docs = req.file;
+                const {path} = docs;
+                const newPath = await uploader(path);
+                console.log("newPath" ,newPath)
+                res.status(200).send(newPath.url)
+            }catch(error){
+                console.log(error);
+            }
+        }
+
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
-        fetchChatForNotification};
+        fetchChatForNotification,uploadImage};

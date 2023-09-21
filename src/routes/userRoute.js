@@ -2,6 +2,7 @@ const express = require('express')
 const user_route = express.Router();
 const user = require('../controllers/userController')
 const tryCatchMiddleware = require('../middlewares/tryCatch')
+const multer = require('../middlewares/multer')
 
 user_route.post('/signup',tryCatchMiddleware(user.signup))
 user_route.post('/signup/googleAuth',tryCatchMiddleware(user.signupWithGoogleAuth))
@@ -17,5 +18,6 @@ user_route.get('/myRides/:id',tryCatchMiddleware(user.myRides))
 user_route.get('/fetchChat',tryCatchMiddleware(user.fetchChat))
 user_route.get('/fetchChatForNotification',tryCatchMiddleware(user.fetchChatForNotification))
 user_route.get('/fetchPreviuosChatDetails',tryCatchMiddleware(user.fetchPreviuosChatDetails))
+user_route.post('/uploadImage',multer,tryCatchMiddleware(user.uploadImage))
 
 module.exports = user_route;
