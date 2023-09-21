@@ -273,13 +273,17 @@
     }
 
         const uploadImage = async(req,res)=>{
-            try{
+            try{ 
                 console.log(req.file);
                 const uploader = async(path)=> await cloudinary.uploads(path,'profilePic');
                 const docs = req.file;
                 const {path} = docs;
                 const newPath = await uploader(path);
-                console.log("newPath" ,newPath)
+                // console.log("newPath" ,newPath)
+                console.log(newPath.url);
+                const profileUpdated = new User({profileURL:newPath.url})
+                await profileUpdated.save();
+                
                 res.status(200).send(newPath.url)
             }catch(error){
                 console.log(error);
