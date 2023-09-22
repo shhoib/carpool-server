@@ -1,6 +1,7 @@
     const User = require("../model/userSchema")
     const rides = require('../model/rideSchema')
     const Chat = require('../model/chatSchema')
+    const Notification = require('../model/notificationSchema')
     const bcrypt = require("bcrypt")
     const jwt = require('jsonwebtoken')
     const cloudinary = require('../cloudinary/cloudinary')
@@ -175,7 +176,6 @@
          const myrides = await rides.find({hosterID:ID});
          const joinedRides = await rides.find({joinerID:ID});
          console.log(joinedRides);
-        //  console.log(myrides);
         const allRides = {joinedRides,myrides}
          if(myrides){
             res.status(200).json({message:'your rides',allRides})
@@ -196,13 +196,10 @@
             { fromID: toId, toID: fromId }   
         ]
     }) 
-        // console.log(isChat); 
   
         if(isChat){
-            // console.log('chat available');
             res.status(200).json({chat:isChat})
         }else{
-            // console.log('not available');
             const newChat = new Chat({fromID:fromId,toID:toId})
             await newChat.save()
             res.status(201).json({chat:newChat})
@@ -221,10 +218,8 @@
             { fromID: toId, toID: fromId }   
         ]
     }) 
-        // console.log(isChat); 
   
         if(isChat){
-            // console.log('chat available');
             res.status(200).json({chat:isChat})
         }else{
             // console.log('not available');
@@ -241,32 +236,27 @@
 
         const isSender = await Chat.find({fromID:userID})
         const isReceiver = await Chat.find({toID:userID})
-        // console.log('sender',isSender);
-        // console.log('receiver',isReceiver);
+    
             
-
+ 
          const allUsers = [];    
 
         if(isSender.length>0){  
             for(const chatID of isSender){
                 const userDetails = await User.find({_id:chatID.toID});
-                // console.log('first',userDetails)
                 if(userDetails){
                     allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
                 }
             }
-            // console.log(allUsers);
         }
          if(isReceiver.length>0){ 
             for(const chatID of isReceiver){
                 const userDetails = await User.find({_id:chatID.fromID});
-                // console.log('second',userDetails)
                 if(userDetails){
                     allUsers.push(userDetails[0])   //TODO: remove[0] if only getting one user
                 }
             }
         }
-        // console.log("last",allUsers);
 
          res.status(200).json({chattedUsers:allUsers})
 
@@ -280,7 +270,6 @@
                 const docs = req.file;
                 const {path} = docs;
                 const newPath = await uploader(path);
-                // console.log("newPath" ,newPath)
                 console.log(newPath.url);
 
                 const profileUpdated = await User.findByIdAndUpdate(userID,{ profileURL: newPath.url }, 
@@ -297,6 +286,31 @@
             }
         }
 
+        /////////sendNotification////////////////////
+
+        const sendNotification= async(req,res)=>{
+            const {senderID,receiverID,message} = req.body;
+            console.log(senderID,receiverID,message);
+            const RECEIVER = await Notification.find({userID:receiverID})
+            console.log("receiver",RECEIVER);
+
+            if(RECEIVER.lenght<=0){ 
+                const createReceiver = new Notification({userID:receiverID,notifications:message})
+                await createReceiver.save();
+                console.log('receiver created');
+                res.status(201).json({notification:createReceiver})
+            }else{
+                RECEIVER.notifications.push(message);
+                await RECEIVER.save();
+                res.status(200).json({ notification: RECEIVER });
+                console.log('eklse case working');
+
+            }
+            console.log('nothing worling');
+        }
+
+
+
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
-        fetchChatForNotification,uploadImage};
+        fetchChatForNotification,uploadImage,sendNotification};
