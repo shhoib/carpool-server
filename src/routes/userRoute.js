@@ -19,6 +19,7 @@ user_route.get('/fetchChat',tryCatchMiddleware(user.fetchChat))
 user_route.get('/fetchChatForNotification',tryCatchMiddleware(user.fetchChatForNotification))
 user_route.get('/fetchPreviuosChatDetails',tryCatchMiddleware(user.fetchPreviuosChatDetails))
 user_route.post('/uploadImage',multer,tryCatchMiddleware(user.uploadImage))
-user_route.post('/sendNotification',multer,tryCatchMiddleware(user.sendNotification))
+user_route.post('/sendNotification',tryCatchMiddleware(user.sendNotification))
+user_route.get('/fetchNotification',tryCatchMiddleware(user.fetchNotification))
 
 module.exports = user_route;

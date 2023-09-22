@@ -1,12 +1,23 @@
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({
-    userID:{
+    userID: {
         type: String
     },
-    notifications:{
-        type: Array
-    }
-})
+   
+    notifications: [
+        {
+            message: {
+                type: String
+            },
+            senderName: {
+                type: String
+            },
+             senderID: {
+                type: String
+            },
+        }
+    ]
+});
 
-module.exports= mongoose.model('notification',notificationSchema);
+module.exports = mongoose.model('notification', notificationSchema);

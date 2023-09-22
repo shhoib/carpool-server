@@ -289,28 +289,39 @@
         /////////sendNotification////////////////////
 
         const sendNotification= async(req,res)=>{
-            const {senderID,receiverID,message} = req.body;
+            const {senderID,receiverID,message,senderName} = req.body;
             console.log(senderID,receiverID,message);
-            const RECEIVER = await Notification.find({userID:receiverID})
+            const RECEIVER = await Notification.findOne({userID:receiverID})
             console.log("receiver",RECEIVER);
 
-            if(RECEIVER.lenght<=0){ 
-                const createReceiver = new Notification({userID:receiverID,notifications:message})
-                await createReceiver.save();
-                console.log('receiver created');
+            if(!RECEIVER){ 
+                const createReceiver = new Notification({
+                userID:receiverID,notifications: [{ message:message, senderName:senderName,senderID:senderID }]})
+                await createReceiver.save();  
                 res.status(201).json({notification:createReceiver})
             }else{
-                RECEIVER.notifications.push(message);
+                RECEIVER.notifications.push({message,senderName,senderID});
                 await RECEIVER.save();
                 res.status(200).json({ notification: RECEIVER });
-                console.log('eklse case working');
 
             }
-            console.log('nothing worling');
+        }
+
+        //////////////fetchNotification//////////////
+        const fetchNotification = async(req,res)=>{
+            const userID = req.query.id;
+            const notification = await Notification.findOne({userID:userID})
+            console.log(notification);
+
+            if(!notification){
+                res.status(209).json({message:'no new notifications'})
+            }else{
+                res.status(200).json({notification})
+            }
         }
 
 
 
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
-        fetchChatForNotification,uploadImage,sendNotification};
+        fetchChatForNotification,uploadImage,sendNotification,fetchNotification};
