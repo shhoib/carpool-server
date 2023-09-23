@@ -288,24 +288,29 @@
 
         /////////sendNotification////////////////////
 
-        const sendNotification= async(req,res)=>{
-            const {senderID,receiverID,message,senderName} = req.body;
-            console.log(senderID,receiverID,message);
-            const RECEIVER = await Notification.findOne({userID:receiverID})
-            console.log("receiver",RECEIVER);
-
-            if(!RECEIVER){ 
+        const sendNotification = async (req, res) => {
+            try {
+                const { senderID, receiverID, message, senderName, type } = req.body;
+                console.log(senderID, receiverID, message, senderName, type);
+                const notificationType = type;
+                const RECEIVER = await Notification.findOne({ userID: receiverID });
+ 
+                if (!RECEIVER) {
                 const createReceiver = new Notification({
-                userID:receiverID,notifications: [{ message:message, senderName:senderName,senderID:senderID }]})
-                await createReceiver.save();  
-                res.status(201).json({notification:createReceiver})
-            }else{
-                RECEIVER.notifications.push({message,senderName,senderID});
+                 userID: receiverID,notifications: [{ message: message,senderName: senderName,
+                    senderID: senderID, notificationType: type }]});
+                    await createReceiver.save();
+                res.status(201).json({ notification: createReceiver });
+                } else {  
+                RECEIVER.notifications.push({ notificationType, message, senderName, senderID});
                 await RECEIVER.save();
                 res.status(200).json({ notification: RECEIVER });
-
+                }
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Server error' });
             }
-        }
+            };
 
         //////////////fetchNotification//////////////
         const fetchNotification = async(req,res)=>{

@@ -7,6 +7,9 @@ const notificationSchema = new mongoose.Schema({
    
     notifications: [
         {
+            notificationType: {
+                type: String
+            },
             message: {
                 type: String
             },
