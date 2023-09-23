@@ -28,9 +28,8 @@ const rideSchema = new mongoose.Schema({
     joinerID:{
         type: String
     },
-    isCompleted : {
-        type : Boolean,
-        default: false
+    status : {
+        type: String
     }
 })
 

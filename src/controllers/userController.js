@@ -94,9 +94,9 @@
     ////////hostRide////////
 
     const hostRide = async (req,res)=>{
-        const {from,to,date,passengers,vehicle,amount,hoster,hosterID} = req.body;
+        const {from,to,date,passengers,vehicle,amount,hoster,hosterID,status} = req.body;
         const ride = new rides({from:from,to:to,date:date,passengers:passengers,vehicle:vehicle,
-            amount:amount,hoster:hoster,hosterID:hosterID})
+            amount:amount,hoster:hoster,hosterID:hosterID,status:status})
         await ride.save();
         res.status(201).json({message:"ride hosted completely"})
     }
@@ -291,10 +291,9 @@
         const sendNotification = async (req, res) => {
             try {
                 const { senderID, receiverID, message, senderName, type } = req.body;
-                console.log(senderID, receiverID, message, senderName, type);
                 const notificationType = type;
                 const RECEIVER = await Notification.findOne({ userID: receiverID });
- 
+   
                 if (!RECEIVER) {
                 const createReceiver = new Notification({
                  userID: receiverID,notifications: [{ message: message,senderName: senderName,
@@ -316,7 +315,7 @@
         const fetchNotification = async(req,res)=>{
             const userID = req.query.id;
             const notification = await Notification.findOne({userID:userID})
-            console.log(notification);
+            // console.log(notification);
 
             if(!notification){
                 res.status(209).json({message:'no new notifications'})
@@ -325,8 +324,34 @@
             }
         }
 
+        ///////deleteNotification////////
+        const deleteNotification = async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+ 
+            try {
+                const notification = await Notification.findOne({ "notifications._id": id });
+                console.log(notification);
+
+                if (!notification) {
+                console.log('no notification'); 
+                return res.status(209).json({ error: "Notification not found" });
+                }
+                notification.notifications.pull({ _id: id });
+                await notification.save();
+
+                res.status(200).json({ message: "Notification deleted successfully" });
+                console.log('deleted');
+
+            } catch (error) {
+                console.error(error); 
+                res.status(500).json({ error: "Server error" });
+            }
+            };
+
+
 
 
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
-        fetchChatForNotification,uploadImage,sendNotification,fetchNotification};
+        fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification};

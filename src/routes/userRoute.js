@@ -21,5 +21,6 @@ user_route.get('/fetchPreviuosChatDetails',tryCatchMiddleware(user.fetchPreviuos
 user_route.post('/uploadImage',multer,tryCatchMiddleware(user.uploadImage))
 user_route.post('/sendNotification',tryCatchMiddleware(user.sendNotification))
 user_route.get('/fetchNotification',tryCatchMiddleware(user.fetchNotification))
+user_route.delete('/deleteNotification/:id',tryCatchMiddleware(user.deleteNotification))
 
 module.exports = user_route;
