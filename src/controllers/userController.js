@@ -20,14 +20,15 @@
                 const user = new User({name:username,email:email,password:hashedPasssword,
                     phoneNumber:phoneNumber,emailVerified:false,phoneNumberVerified:false}) 
                 await user.save();
-                
+                 
                 const savedUser = await User.findOne({email})
                 const userID = savedUser._id;
 
                 res.status(201).json({message: "Account created successfully, Logging In",token,userID})
             }else{
                 const userID = existingUser._id;
-                res.json({message:"user already registered",token,userID});
+                res.json({message:"user already registered",token,existingUser,userID});
+                console.log(existingUser);
             }
         }
 
@@ -65,6 +66,7 @@
         if (passwordMatch) {
             const token = jwt.sign(user.name,'secretKey')
             res.status(200).json({ message: "user logged in successfully",token,user });
+            console.log(user);
         } else {
             res.status(209).json({ message: "username or password mismatch" });
         }
@@ -290,18 +292,19 @@
 
         const sendNotification = async (req, res) => {
             try {
-                const { senderID, receiverID, message, senderName, type } = req.body;
+                const { senderID, receiverID, message, senderName, type,rideID } = req.body;
+                console.log('usersssss',senderID, receiverID, message, senderName, type,rideID);
                 const notificationType = type;
                 const RECEIVER = await Notification.findOne({ userID: receiverID });
-   
+      
                 if (!RECEIVER) {
                 const createReceiver = new Notification({
                  userID: receiverID,notifications: [{ message: message,senderName: senderName,
-                    senderID: senderID, notificationType: type }]});
+                    senderID: senderID, notificationType: type,rideID:rideID }]});
                     await createReceiver.save();
                 res.status(201).json({ notification: createReceiver });
                 } else {  
-                RECEIVER.notifications.push({ notificationType, message, senderName, senderID});
+                RECEIVER.notifications.push({ notificationType, message, senderName, senderID,rideID});
                 await RECEIVER.save();
                 res.status(200).json({ notification: RECEIVER });
                 }
@@ -314,9 +317,9 @@
         //////////////fetchNotification//////////////
         const fetchNotification = async(req,res)=>{
             const userID = req.query.id;
+            // console.log(userID);
             const notification = await Notification.findOne({userID:userID})
-            // console.log(notification);
-
+ 
             if(!notification){
                 res.status(209).json({message:'no new notifications'})
             }else{
@@ -327,21 +330,21 @@
         ///////deleteNotification////////
         const deleteNotification = async (req, res) => {
             const id = req.params.id;
-            console.log(id);
+            // console.log(id);
  
             try {
                 const notification = await Notification.findOne({ "notifications._id": id });
-                console.log(notification);
+                // console.log(notification);
 
                 if (!notification) {
-                console.log('no notification'); 
+                // console.log('no notification'); 
                 return res.status(209).json({ error: "Notification not found" });
                 }
                 notification.notifications.pull({ _id: id });
                 await notification.save();
 
                 res.status(200).json({ message: "Notification deleted successfully" });
-                console.log('deleted');
+                // console.log('deleted');
 
             } catch (error) {
                 console.error(error); 
@@ -349,9 +352,16 @@
             }
             };
 
+            /////////////changeRideStatus/////////
+            const changeRideStatus = async(req,res)=>{
+                const {rideID } = req.body
+                // console.log(req.body);
+
+            }
+
 
 
 
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
-        fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification};
+        fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus};

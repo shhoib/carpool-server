@@ -19,6 +19,9 @@ const notificationSchema = new mongoose.Schema({
              senderID: {
                 type: String
             },
+             rideID: {
+                type: String
+            },
         }
     ]
 });
