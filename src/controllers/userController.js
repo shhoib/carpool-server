@@ -172,7 +172,7 @@
     }
 
  
-    //////////myRIdes/////
+    //////////myRIdes///////
     const myRides = async(req,res)=>{
         const ID = req.params.id; 
          const myrides = await rides.find({hosterID:ID});
@@ -293,7 +293,7 @@
         const sendNotification = async (req, res) => {
             try {
                 const { senderID, receiverID, message, senderName, type,rideID } = req.body;
-                console.log('usersssss',senderID, receiverID, message, senderName, type,rideID);
+                // console.log('usersssss',senderID, receiverID, message, senderName, type,rideID);
                 const notificationType = type;
                 const RECEIVER = await Notification.findOne({ userID: receiverID });
       
@@ -308,6 +308,8 @@
                 await RECEIVER.save();
                 res.status(200).json({ notification: RECEIVER });
                 }
+                // const updatedJoinerID = await rides.findByIdAndUpdate( rideID, { joinerID: receiverID },
+                // { new: true })
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ error: 'Server error' });
@@ -354,9 +356,15 @@
 
             /////////////changeRideStatus/////////
             const changeRideStatus = async(req,res)=>{
-                const {rideID } = req.body
-                // console.log(req.body);
-
+                const {rideID,receiverID } = req.body
+                console.log(rideID);
+                const updatedRide = await rides.findByIdAndUpdate( rideID,{ status:'started',joinerID:receiverID },
+                { new: true })
+            
+                if (!updatedRide) {
+                    return res.status(404).json({ message: 'Ride not found' });
+                  }
+               res.status(200).json(updatedRide);
             }
 
 
