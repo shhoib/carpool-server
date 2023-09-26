@@ -372,28 +372,29 @@
 
 
         ////////review////////
-        const review=async(req,res)=>{
+        const review = async(req,res)=>{
             const { toUserID,ratedByID,ratedImogi,aboutRide} = req.body;
             console.log( toUserID,ratedByID,ratedImogi,aboutRide);
-            const user = await ratings.findById({userID:toUserID});
-            if(!user){
+            const user = await ratings.find({userID:toUserID});
+            
+            if(user.length==0){
+                console.log('no user');
+
                 const saveRating = new ratings({
                     userID:toUserID,ratings:[{
                         ratedByID:ratedByID,ratedImogi:ratedImogi,aboutRide:aboutRide }]});
                         await saveRating.save();
             }else{
-            await ratings.updateOne(
-            { userID: toUserID },
-            {
-                $push: {
+                await ratings.updateOne(
+                { userID: toUserID },
+                { $push: {
                 ratings: {
                     ratedByID: ratedByID,
                     ratedImogi: ratedImogi,
                     aboutRide: aboutRide,
                 },
-                },
-            }
-            );
+               },
+            });
             }
         }
 
