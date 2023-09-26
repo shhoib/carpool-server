@@ -7,7 +7,7 @@
     const cloudinary = require('../cloudinary/cloudinary')
     const path = require('path')
 
- 
+  
     //////////signup////////
     const signup= async (req,res)=>{
             const {email,password,username,phoneNumber} = req.body;
@@ -15,8 +15,8 @@
             const token = jwt.sign({username},'secretKey')
 
             const existingUser = await User.findOne({email})
+            const hashedPasssword = await bcrypt.hash(password,10)
             if(!existingUser){
-                const hashedPasssword = await bcrypt.hash(password,10)
                 const user = new User({name:username,email:email,password:hashedPasssword,
                     phoneNumber:phoneNumber,emailVerified:false,phoneNumberVerified:false}) 
                 await user.save();
@@ -59,6 +59,7 @@
 
     const login = async (req, res) => {
     const { email, password } = req.body; 
+    console.log(email);
     const user = await User.findOne({ email });
 
     if (user) {
@@ -66,7 +67,7 @@
         if (passwordMatch) {
             const token = jwt.sign(user.name,'secretKey')
             res.status(200).json({ message: "user logged in successfully",token,user });
-            console.log(user);
+            // console.log(user);
         } else {
             res.status(209).json({ message: "username or password mismatch" });
         }
@@ -177,6 +178,7 @@
         const ID = req.params.id; 
          const myrides = await rides.find({hosterID:ID});
          const joinedRides = await rides.find({joinerID:ID});
+         console.log(myRides);
          console.log(joinedRides);
         const allRides = {joinedRides,myrides}
          if(myrides){
