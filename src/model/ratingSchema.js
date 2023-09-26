@@ -6,7 +6,7 @@ const ratingSchema = new mongoose.Schema({
          ref : "user"
     },
     ratings:[{    
-            raterByID:{
+            ratedByID:{
                 type : mongoose.Schema.Types.ObjectId,
                  ref : "user"
             },
