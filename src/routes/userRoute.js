@@ -24,5 +24,7 @@ user_route.get('/fetchNotification',tryCatchMiddleware(user.fetchNotification))
 user_route.delete('/deleteNotification/:id',tryCatchMiddleware(user.deleteNotification))
 user_route.post('/changeRideStatus',tryCatchMiddleware(user.changeRideStatus))
 user_route.post('/review',tryCatchMiddleware(user.review))
+user_route.post('/orders',tryCatchMiddleware(user.orders))
+user_route.get('/reviews',tryCatchMiddleware(user.reviews))
 
 module.exports = user_route;

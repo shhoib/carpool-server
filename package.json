@@ -9,6 +9,7 @@
     "mongoose": "^7.3.4",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.0.1",
+    "razorpay": "^2.9.2",
     "socket.io": "^4.7.2"
   },
   "name": "carpool",

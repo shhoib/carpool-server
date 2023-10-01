@@ -7,6 +7,8 @@
     const jwt = require('jsonwebtoken')
     const cloudinary = require('../cloudinary/cloudinary')
     const path = require('path')
+    const Razorpay = require('razorpay')
+    const crypto = require('crypto')
 
   
     //////////signup////////
@@ -195,19 +197,22 @@
         const {toId,fromId} = req.query
         console.log(toId,fromId); 
 
+        const toUser = await User.findOne({_id:toId})
+        // console.log('userrr',toUser);
+
         const isChat = await Chat.findOne({
         $or: [
             { fromID: fromId, toID: toId },
             { fromID: toId, toID: fromId }   
         ]
     }) 
-  
+   
         if(isChat){
-            res.status(200).json({chat:isChat})
+            res.status(200).json({chat:isChat,toUser:toUser})
         }else{
             const newChat = new Chat({fromID:fromId,toID:toId})
             await newChat.save()
-            res.status(201).json({chat:newChat})
+            res.status(201).json({chat:newChat,toUser:toUser})
         }
     }
 
@@ -373,7 +378,9 @@
 
         ////////review////////
         const review = async(req,res)=>{
-            const { toUserID,ratedByID,ratedImogi,aboutRide} = req.body;
+            const razor = process.env.RAZOR_PAY_KEY_ID;
+            console.log('raxor',razor);
+            const { toUserID,ratedByID,ratedImogi,aboutRide,rideID} = req.body;
             console.log( toUserID,ratedByID,ratedImogi,aboutRide);
             const user = await ratings.find({userID:toUserID});
             
@@ -384,7 +391,11 @@
                     userID:toUserID,ratings:[{
                         ratedByID:ratedByID,ratedImogi:ratedImogi,aboutRide:aboutRide }]});
                         await saveRating.save();
-            }else{
+
+                const updateRide = await rides.findByIdAndUpdate(rideID,{status:'completed'},{new:true})
+
+                res.status(201).json({message:'Thanks for your rating'})
+            }else{          
                 await ratings.updateOne(
                 { userID: toUserID },
                 { $push: {
@@ -395,8 +406,60 @@
                 },
                },
             });
+            const updateRide = await rides.findByIdAndUpdate(rideID,{status:'completed'},{new:true})
+
+            res.status(200).json({message:'Thanks for your rating'})
             }
         }
+
+    ////////orders///////
+    const orders = async(req,res)=>{
+        console.log(req.body.amount);
+        const instance = new Razorpay({
+            key_id : process.env.RAZOR_PAY_KEY_ID,
+            key_secret : process.env.RAZOR_PAY_SECRET
+        });
+
+        const options = {
+            amount : req.body.amount*100,
+            currency : 'INR',
+            receipt : crypto.randomBytes(10).toString('hex')
+        };
+
+        instance.orders.create(options,(error,order)=>{
+            if(error){
+                console.log(error);
+                return res.status(500).json({message:"something went wrong"})
+            }
+            res.status(200).json({data:order})
+        })
+    } 
+
+
+    //////////////verify/////////
+    const verify = async(req,res)=>{
+        const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
+        const sign = razorpay_order_id + '|' + razorpay_payment_id ;
+        const expectedSign = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
+        .update(sign.toString()).digest('hex')
+
+        if(razorpay_signature == expectedSign){
+            return res.status(200).json({message:'payment verified succesfully'})
+        }else{
+            return res.status(209).json({message:'invalid signature sent'})
+        }
+ 
+    }
+
+
+    ///////////////////////////
+    const reviews = async(req,res)=>{
+        const userID = req.query.userID;
+        console.log(userID);
+        const userRatings = await ratings.findOne({userID:userID})
+        console.log(userRatings);
+        res.status(200).json({userRatings})
+    }
 
 
  
@@ -404,4 +467,4 @@
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
         fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus,
-        review};
+        review,orders,verify,reviews};
