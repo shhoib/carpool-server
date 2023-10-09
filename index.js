@@ -17,6 +17,7 @@ const io = new Server(server,{
 
 io.on('connection', (socket)=>{
     // console.log(`user connected : ${socket.id}`);
+
  
     socket.on('disconnect',()=>{
         // console.log(`user disconnected: ${socket.id}`);
@@ -27,9 +28,12 @@ io.on('connection', (socket)=>{
         console.log(`joined room ${data}`);
     }) 
    
+    
+
     socket.on('send_message',(data)=>{ 
         socket.to(data.room).emit('receive_message', data)
     })   
+
     socket.on('send_notification',(data)=>{
         const {socketID,message} = data
         console.log(socketID,message); 
@@ -38,18 +42,6 @@ io.on('connection', (socket)=>{
     socket.on('typing', (room) => socket.in(room).emit('typing'))
     socket.on('stop typing', (room) => socket.in(room).emit('stop typing'))
 
-    socket.on('user:call',({to,offer})=>{
-        io.to(to).emit('incoming:call',{from:to,offer}) 
-    })
-    socket.on('call:accepted',({to,ans})=>{
-        io.to(to).emit('call:accepted',{from:to,ans}) 
-    })
-    socket.on('peer:nego:needed',({to,offer})=>{
-        io.to(to).emit('peer:nego:needed',{from:to,offer}) 
-    })
-    socket.on('peer:nego:done',({to,ans})=>{
-        io.to(to).emit('peer:nego:final',{from:to,ans}) 
-    })
 })
 
   
