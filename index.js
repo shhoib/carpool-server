@@ -18,17 +18,25 @@ const io = new Server(server,{
 io.on('connection', (socket)=>{
     // console.log(`user connected : ${socket.id}`);
 
+    socket.emit('me',socket.id)
+
+    socket.on('calluser',({userToCall,signalData,from,name})=>{
+        io.to(userToCall).emit('callUser',{signal:signalData,from,name})
+
+        socket.on('answerCall',(data)=>{
+            io.to(data.to).emit('callaccepted',data.signal)
+        })
+    })
  
     socket.on('disconnect',()=>{
         // console.log(`user disconnected: ${socket.id}`);
+        socket.broadcast.emit('callended')
     })
 
     socket.on('join_room',(data)=>{
         socket.join(data)  
         console.log(`joined room ${data}`);
     }) 
-   
-    
 
     socket.on('send_message',(data)=>{ 
         socket.to(data.room).emit('receive_message', data)
