@@ -26,5 +26,6 @@ user_route.post('/changeRideStatus',tryCatchMiddleware(user.changeRideStatus))
 user_route.post('/review',tryCatchMiddleware(user.review))
 user_route.post('/orders',tryCatchMiddleware(user.orders))
 user_route.get('/reviews',tryCatchMiddleware(user.reviews))
+user_route.get('/getKey',tryCatchMiddleware(user.getKey))
 
 module.exports = user_route;

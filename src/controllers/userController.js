@@ -329,6 +329,7 @@
             const userID = req.query.id;
             // console.log(userID);
             const notification = await Notification.findOne({userID:userID})
+            console.log(notification);
  
             if(!notification){
                 res.status(209).json({message:'no new notifications'})
@@ -412,42 +413,46 @@
             }
         }
 
+  
     ////////orders///////
     const orders = async(req,res)=>{
-        console.log(req.body.amount);
+        // console.log(req.body.amount);
+
         const instance = new Razorpay({
             key_id : process.env.RAZOR_PAY_KEY_ID,
             key_secret : process.env.RAZOR_PAY_SECRET
         });
 
         const options = {
-            amount : req.body.amount*100,
+            amount : req.body.amount*100, 
             currency : 'INR',
-            receipt : crypto.randomBytes(10).toString('hex')
         };
-
-        instance.orders.create(options,(error,order)=>{
-            if(error){
-                console.log(error);
-                return res.status(500).json({message:"something went wrong"})
-            }
-            res.status(200).json({data:order})
-        })
+        const order = await instance.orders.create(options)
+        console.log(order); 
+        res.status(200).json(order) 
+    
     } 
 
 
-    //////////////verify/////////
-    const verify = async(req,res)=>{
-        const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
-        const sign = razorpay_order_id + '|' + razorpay_payment_id ;
-        const expectedSign = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
-        .update(sign.toString()).digest('hex')
+   ///////////// getKey ///////////////
+    const getKey = async(req,res)=>{
+        res.status(200).json({key:process.env.RAZOR_PAY_KEY_ID})
+    }
 
-        if(razorpay_signature == expectedSign){
-            return res.status(200).json({message:'payment verified succesfully'})
-        }else{
-            return res.status(209).json({message:'invalid signature sent'})
-        }
+
+    //////////////paymentVerification/////////
+    const paymentVerification = async(req,res)=>{
+        console.log(req.body);
+        // const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
+        // const sign = razorpay_order_id + '|' + razorpay_payment_id ;
+        // const expectedSign = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
+        // .update(sign.toString()).digest('hex')
+
+        // if(razorpay_signature == expectedSign){
+        //     return res.status(200).json({message:'payment verified succesfully'})
+        // }else{
+        //     return res.status(209).json({message:'invalid signature sent'})
+        // }
  
     }
 
@@ -467,4 +472,4 @@
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
         fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus,
-        review,orders,verify,reviews};
+        review,orders,paymentVerification,reviews,getKey};
