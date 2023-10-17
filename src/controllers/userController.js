@@ -1,6 +1,7 @@
     const User = require("../model/userSchema")
     const rides = require('../model/rideSchema')
     const Chat = require('../model/chatSchema')
+    const Payment = require('../model/paymentSchema')
     const Notification = require('../model/notificationSchema')
     const ratings = require('../model/ratingSchema')
     const bcrypt = require("bcrypt")
@@ -441,7 +442,6 @@
 
     //////////////paymentVerification/////////
     const paymentVerification = async(req,res)=>{
-        console.log(req.body,'body');
         const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
        
         const body = razorpay_order_id + '|' + razorpay_payment_id ;
@@ -449,28 +449,25 @@
         const expectedSignature = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
         .update(body.toString()).digest('hex')
 
-        const axios = require('axios');
+        const instance = new Razorpay({
+            key_id : process.env.RAZOR_PAY_KEY_ID,
+            key_secret : process.env.RAZOR_PAY_SECRET
+        });
+        const details = await instance.payments.fetch(razorpay_payment_id)
+        console.log(details);
 
-const RAZORPAY_API_KEY = 'rzp_test_SKjX793ZDy3CRU'; // Replace with your Razorpay API key
-const PAYMENT_ID = razorpay_payment_id; // Replace with the payment ID you want to retrieve details for
-
-axios({
-  method: 'get',
-  url: `https://api.razorpay.com/v1/payments/${PAYMENT_ID}`,
-  headers: {
-    'Authorization': `Basic ${Buffer.from(`${RAZORPAY_API_KEY}:`).toString('base64')}`,
-  },
-})
-  .then(response => {
-    console.log('Payment Details:', response.data);
-  })
-  .catch(error => {
-    console.error('Error fetching payment details:', error);
-  });
 
 
         if(razorpay_signature == expectedSignature){ 
-            //TODO:save to databse here
+            
+            const createdAtDate = new Date(details.created_at * 1000);
+            const formattedCreatedAt = createdAtDate.toLocaleString();
+            // console.log(formattedCreatedAt);
+
+            const savePayment = new Payment({payment_id:details.id,razorPay_order_id:details.order_id,amount:details.amount/100,
+                payed_by:details.email,payed_at:formattedCreatedAt}) 
+            await savePayment.save();
+
              res.redirect(`http://localhost:5173/PaymentVerification?reference=${razorpay_payment_id}`)
         }else{
              res.status(209).json({message:'invalid signature sent'})
@@ -488,9 +485,17 @@ axios({
     }
 
 
+    ////////////saveReceiverName/////////////
+    const saveReceiverName = async(req,res)=>{
+        const { userID,payment_id } =req.body;
+        console.log(userID,payment_id);
+
+    }
+
+
  
 
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
         fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus,
-        review,orders,paymentVerification,reviews,getKey};
+        review,orders,paymentVerification,reviews,getKey,saveReceiverName};
