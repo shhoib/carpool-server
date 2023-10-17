@@ -181,8 +181,7 @@
         const ID = req.params.id; 
          const myrides = await rides.find({hosterID:ID});
          const joinedRides = await rides.find({joinerID:ID});
-         console.log(myRides);
-         console.log(joinedRides);
+       
         const allRides = {joinedRides,myrides}
          if(myrides){
             res.status(200).json({message:'your rides',allRides})
@@ -428,7 +427,7 @@
             currency : 'INR',
         };
         const order = await instance.orders.create(options)
-        console.log(order); 
+        // console.log(order); 
         res.status(200).json(order) 
     
     } 
@@ -442,17 +441,23 @@
 
     //////////////paymentVerification/////////
     const paymentVerification = async(req,res)=>{
-        console.log(req.body);
-        // const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
-        // const sign = razorpay_order_id + '|' + razorpay_payment_id ;
-        // const expectedSign = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
-        // .update(sign.toString()).digest('hex')
+        // console.log(req.body);
+        const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
 
-        // if(razorpay_signature == expectedSign){
-        //     return res.status(200).json({message:'payment verified succesfully'})
-        // }else{
-        //     return res.status(209).json({message:'invalid signature sent'})
-        // }
+        const body = razorpay_order_id + '|' + razorpay_payment_id ;
+
+        const expectedSignature = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
+        .update(body.toString()).digest('hex')
+
+        console.log('sig received',razorpay_signature);
+        console.log('sig genereated',expectedSignature);
+
+        if(razorpay_signature == expectedSignature){ 
+            //save to databse here
+            return res.redirect(`http://localhost:5173/paymentsuccess?reference=${razorpay_payment_id}`)
+        }else{
+            return res.status(209).json({message:'invalid signature sent'})
+        }
  
     }
 
