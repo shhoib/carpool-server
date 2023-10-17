@@ -29,7 +29,6 @@ io.on('connection', (socket)=>{
     })
  
     socket.on('disconnect',()=>{
-        // console.log(`user disconnected: ${socket.id}`);
         socket.broadcast.emit('callended')
     })
 
@@ -58,7 +57,7 @@ const PORT = process.env.PORT;
 
 app.use(cors()); 
 app.use(express.json())
-// app.use(express.urlencoded({ limit: "30mb", extended: true }));
+app.use(express.urlencoded({ limit: "30mb", extended: true }));
 
 
 const mongoose = require("mongoose");

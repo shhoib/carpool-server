@@ -441,24 +441,40 @@
 
     //////////////paymentVerification/////////
     const paymentVerification = async(req,res)=>{
-        // console.log(req.body);
+        console.log(req.body,'body');
         const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
-
+       
         const body = razorpay_order_id + '|' + razorpay_payment_id ;
 
         const expectedSignature = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
         .update(body.toString()).digest('hex')
 
-        console.log('sig received',razorpay_signature);
-        console.log('sig genereated',expectedSignature);
+        const axios = require('axios');
+
+const RAZORPAY_API_KEY = 'rzp_test_SKjX793ZDy3CRU'; // Replace with your Razorpay API key
+const PAYMENT_ID = razorpay_payment_id; // Replace with the payment ID you want to retrieve details for
+
+axios({
+  method: 'get',
+  url: `https://api.razorpay.com/v1/payments/${PAYMENT_ID}`,
+  headers: {
+    'Authorization': `Basic ${Buffer.from(`${RAZORPAY_API_KEY}:`).toString('base64')}`,
+  },
+})
+  .then(response => {
+    console.log('Payment Details:', response.data);
+  })
+  .catch(error => {
+    console.error('Error fetching payment details:', error);
+  });
+
 
         if(razorpay_signature == expectedSignature){ 
-            //save to databse here
-            return res.redirect(`http://localhost:5173/paymentsuccess?reference=${razorpay_payment_id}`)
+            //TODO:save to databse here
+             res.redirect(`http://localhost:5173/PaymentVerification?reference=${razorpay_payment_id}`)
         }else{
-            return res.status(209).json({message:'invalid signature sent'})
+             res.status(209).json({message:'invalid signature sent'})
         }
- 
     }
 
 
