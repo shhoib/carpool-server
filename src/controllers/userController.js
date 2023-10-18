@@ -449,26 +449,27 @@
         const expectedSignature = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
         .update(body.toString()).digest('hex')
 
-        const instance = new Razorpay({
-            key_id : process.env.RAZOR_PAY_KEY_ID,
-            key_secret : process.env.RAZOR_PAY_SECRET
-        });
-        const details = await instance.payments.fetch(razorpay_payment_id)
-        console.log(details);
+        // const instance = new Razorpay({
+        //     key_id : process.env.RAZOR_PAY_KEY_ID,
+        //     key_secret : process.env.RAZOR_PAY_SECRET
+        // });
+        // const details = await instance.payments.fetch(razorpay_payment_id)
+        // console.log(details);
 
 
 
         if(razorpay_signature == expectedSignature){ 
             
-            const createdAtDate = new Date(details.created_at * 1000);
-            const formattedCreatedAt = createdAtDate.toLocaleString();
+            // const createdAtDate = new Date(details.created_at * 1000);
+            // const formattedCreatedAt = createdAtDate.toLocaleString();
             // console.log(formattedCreatedAt);
 
-            const savePayment = new Payment({payment_id:details.id,razorPay_order_id:details.order_id,amount:details.amount/100,
-                payed_by:details.email,payed_at:formattedCreatedAt}) 
-            await savePayment.save();
+            // const savePayment = new Payment({payment_id:details.id,razorPay_order_id:details.order_id,amount:details.amount/100,
+            //     payed_by:details.email,payed_at:formattedCreatedAt}) 
+                // await savePayment.save();
+            res.json({ message: 'Payment successful' });
 
-             res.redirect(`http://localhost:5173/PaymentVerification?reference=${razorpay_payment_id}`)
+            //  res.redirect(`http://localhost:5173/PaymentVerification?reference=${razorpay_payment_id}`)
         }else{
              res.status(209).json({message:'invalid signature sent'})
         }
@@ -480,15 +481,16 @@
         const userID = req.query.userID;
         console.log(userID);
         const userRatings = await ratings.findOne({userID:userID})
-        console.log(userRatings);
         res.status(200).json({userRatings})
     }
 
 
     ////////////saveReceiverName/////////////
     const saveReceiverName = async(req,res)=>{
-        const { userID,payment_id } =req.body;
-        console.log(userID,payment_id);
+        console.log('working');
+        console.log(req.body);
+        const {order_id,USERID,payed_by,amount,payed_At } =req.body;
+        console.log(order_id,USERID,payed_by,amount,payed_At);
 
     }
 
