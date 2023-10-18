@@ -442,34 +442,58 @@
 
     //////////////paymentVerification/////////
     const paymentVerification = async(req,res)=>{
+        const USERID = req.query.USERID;
+        const payed_by = req.query.payed_by;
+        const rideID = req.query.rideID;
+
+        console.log(rideID);
+
         const {razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body
        
         const body = razorpay_order_id + '|' + razorpay_payment_id ;
 
         const expectedSignature = crypto.createHmac('sha256',process.env.RAZOR_PAY_SECRET)
         .update(body.toString()).digest('hex')
-
-        // const instance = new Razorpay({
-        //     key_id : process.env.RAZOR_PAY_KEY_ID,
-        //     key_secret : process.env.RAZOR_PAY_SECRET
-        // });
-        // const details = await instance.payments.fetch(razorpay_payment_id)
-        // console.log(details);
-
+ 
+        const instance = new Razorpay({
+            key_id : process.env.RAZOR_PAY_KEY_ID,
+            key_secret : process.env.RAZOR_PAY_SECRET
+        });
+        const details = await instance.payments.fetch(razorpay_payment_id)
 
 
         if(razorpay_signature == expectedSignature){ 
+
+            const updateRide = await rides.findByIdAndUpdate(rideID,{isPaymentCompleted:true},{new:true})
+
+
+            const userExist = await Payment.find({USERID:USERID})
+
+            const createdAtDate = new Date(details.created_at * 1000);
+            const formattedCreatedAt = createdAtDate.toLocaleString();
+
+            if(!userExist){
             
-            // const createdAtDate = new Date(details.created_at * 1000);
-            // const formattedCreatedAt = createdAtDate.toLocaleString();
-            // console.log(formattedCreatedAt);
+            const savePayment = new Payment({USERID:USERID, payment_details:[{
+                razorPay_order_id:razorpay_order_id,amount:details.amount/100,payed_by:payed_by,payed_at:formattedCreatedAt
+            }]}) 
+   
+               await savePayment.save();
 
-            // const savePayment = new Payment({payment_id:details.id,razorPay_order_id:details.order_id,amount:details.amount/100,
-            //     payed_by:details.email,payed_at:formattedCreatedAt}) 
-                // await savePayment.save();
-            res.json({ message: 'Payment successful' });
+            }else{
+                await Payment.updateOne(
+                    { USERID: USERID },
+                    { $push: {
+                            payment_details: {
+                                razorPay_order_id: razorpay_order_id,
+                                amount: details.amount / 100,
+                                payed_by: payed_by,
+                                payed_at: formattedCreatedAt
+                      }}}
+                );
+            }
+            res.redirect(`http://localhost:5173/PaymentVerification?reference=${razorpay_payment_id}`)
 
-            //  res.redirect(`http://localhost:5173/PaymentVerification?reference=${razorpay_payment_id}`)
         }else{
              res.status(209).json({message:'invalid signature sent'})
         }
@@ -487,17 +511,28 @@
 
     ////////////saveReceiverName/////////////
     const saveReceiverName = async(req,res)=>{
-        console.log('working');
-        console.log(req.body);
         const {order_id,USERID,payed_by,amount,payed_At } =req.body;
-        console.log(order_id,USERID,payed_by,amount,payed_At);
 
     }
 
 
- 
+    ////////////fetchPayments///////////
+    const fetchPayments = async(req,res)=>{
+        const userID = req.query.userID;
+        // console.log(userID);
 
+        const payments = await Payment.findOne({USERID:userID})
+        console.log(payments);
+        if(payments){
+            res.status(200).json({payments})
+        }else{
+            res.status(209).json({message:'you don`t have any payments'})
+        }
+    }
+ 
+ 
+ 
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
         fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus,
-        review,orders,paymentVerification,reviews,getKey,saveReceiverName};
+        review,orders,paymentVerification,reviews,getKey,saveReceiverName,fetchPayments};
