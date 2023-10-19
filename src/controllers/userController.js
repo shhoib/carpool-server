@@ -530,9 +530,16 @@
         }
     }
  
+
+    /////////////updateNumber/////////////////////////////
+    const updateNumber = async(req,res)=>{
+        const id = req.query.id;
+        const updateUser = await User.findByIdAndUpdate(id,{phoneNumberVerified:true},{new:true})
+        res.status(200).json({message:'ok'})
+    }
  
  
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
         fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus,
-        review,orders,paymentVerification,reviews,getKey,saveReceiverName,fetchPayments};
+        review,orders,paymentVerification,reviews,getKey,saveReceiverName,fetchPayments,updateNumber};
