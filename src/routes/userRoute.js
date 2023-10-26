@@ -31,5 +31,6 @@ user_route.post('/paymentVerification',tryCatchMiddleware(user.paymentVerificati
 user_route.post('/saveReceiverName',tryCatchMiddleware(user.saveReceiverName))
 user_route.get('/fetchPayments',tryCatchMiddleware(user.fetchPayments))
 user_route.get('/updateNumber',tryCatchMiddleware(user.updateNumber))
+user_route.get('/hostedRideDetails',tryCatchMiddleware(user.hostedRideDetails))
 
 module.exports = user_route;

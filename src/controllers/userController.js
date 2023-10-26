@@ -10,6 +10,7 @@
     const path = require('path')
     const Razorpay = require('razorpay')
     const crypto = require('crypto')
+const { log } = require("console")
 
   
     //////////signup////////
@@ -537,9 +538,20 @@
         const updateUser = await User.findByIdAndUpdate(id,{phoneNumberVerified:true},{new:true})
         res.status(200).json({message:'ok'})
     }
- 
+
+
+    ///////////hostedRideDetails//////////////
+    const hostedRideDetails = async(req,res)=>{
+        const id = req.query.id;
+        const hostedRideDetails = await rides.findOne({_id:id})
+        console.log(hostedRideDetails); 
+        if(hostedRideDetails){
+            return res.status(200).json({hostedRideDetails})
+        }
+    }
  
     module.exports = {signup,login,hostRide,joinRide,loginWithGoogleAuth,signupWithGoogleAuth,rideDetails,
         hosterDetails,EditPersonalDetails,EditPassword,myRides,fetchChat,fetchPreviuosChatDetails,
         fetchChatForNotification,uploadImage,sendNotification,fetchNotification,deleteNotification,changeRideStatus,
-        review,orders,paymentVerification,reviews,getKey,saveReceiverName,fetchPayments,updateNumber};
+        review,orders,paymentVerification,reviews,getKey,saveReceiverName,fetchPayments,updateNumber,
+        hostedRideDetails};
