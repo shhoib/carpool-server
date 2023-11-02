@@ -181,8 +181,9 @@ const { log } = require("console")
     //////////myRIdes///////
     const myRides = async(req,res)=>{
         const ID = req.params.id; 
-         const myrides = await rides.find({hosterID:ID});
+         const myrides = await rides.find({hosterID:ID}).populate('joinerID');
          const joinedRides = await rides.find({joinerID:ID});
+         console.log(myrides);
        
         const allRides = {joinedRides,myrides}
          if(myrides){
@@ -192,7 +193,7 @@ const { log } = require("console")
          }
     }
 
- 
+  
     //////////fetchChat///////////
     const fetchChat =async(req,res)=>{   
         const {toId,fromId} = req.query

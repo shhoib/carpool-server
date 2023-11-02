@@ -26,7 +26,8 @@ const rideSchema = new mongoose.Schema({
         type: String
     },
     joinerID:{
-        type: String
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "user"
     },
     status : {
         type: String
